@@ -9,6 +9,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  QT_VERSION: "6.7.2"
+  ANDROID_ABI: "arm64-v8a"
+  ANDROID_ARCH: "android_arm64_v8a"
+  NDK_VERSION: "26.1.10909125"
+
 jobs:
   build:
     name: Android (APK + AAB)
@@ -22,48 +28,55 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Install desktop Qt (host tools for androiddeployqt/moc)
+      # Provides a working `sdkmanager` on PATH and sets ANDROID_SDK_ROOT.
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK + platform + build-tools
+        run: |
+          sdkmanager "ndk;${NDK_VERSION}" "platforms;android-34" "build-tools;34.0.0"
+          echo "ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
+
+      - name: Install host Qt (moc / androiddeployqt)
         uses: jurplel/install-qt-action@v4
         with:
-          version: "6.7.2"
+          version: ${{ env.QT_VERSION }}
           host: linux
           target: desktop
           arch: linux_gcc_64
+          dir: ${{ runner.temp }}/qt-host
           modules: qtwebview
           cache: true
 
       - name: Install Android Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: "6.7.2"
+          version: ${{ env.QT_VERSION }}
           host: linux
           target: android
-          arch: android_arm64_v8a
+          arch: ${{ env.ANDROID_ARCH }}
+          dir: ${{ runner.temp }}/qt-android
           modules: qtwebview
           cache: true
 
-      - name: Install NDK + CMake
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ninja-build
-          echo "y" | sdkmanager "ndk;26.1.10909125" "platforms;android-34" "build-tools;34.0.0"
+      - name: Install Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
 
-      - name: Configure (Android arm64)
-        env:
-          ANDROID_NDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}/ndk/26.1.10909125
+      - name: Configure (Android ${{ env.ANDROID_ABI }})
         run: |
-          $QT_ROOT_DIR/bin/qt-cmake -S . -B build-android -G Ninja \
+          HOST_QT="${{ runner.temp }}/qt-host/${QT_VERSION}/gcc_64"
+          ANDROID_QT="${{ runner.temp }}/qt-android/${QT_VERSION}/${ANDROID_ARCH}"
+          "${ANDROID_QT}/bin/qt-cmake" -S . -B build-android -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DANDROID_ABI=arm64-v8a \
-            -DQT_HOST_PATH="$QT_HOST_ROOT_DIR" \
+            -DANDROID_ABI=${ANDROID_ABI} \
+            -DQT_HOST_PATH="${HOST_QT}" \
             -DGEOBIZ_BUILD_TESTS=OFF
 
       - name: Build APK + AAB
         run: |
           cmake --build build-android
-          # androiddeployqt outputs both the APK and the AAB bundle.
           cmake --build build-android --target apk
-          cmake --build build-android --target aab || true
+          cmake --build build-android --target aab
 
       - name: Upload Android packages
         uses: actions/upload-artifact@v4
@@ -72,3 +85,4 @@ jobs:
           path: |
             build-android/**/*.apk
             build-android/**/*.aab
+          if-no-files-found: warn

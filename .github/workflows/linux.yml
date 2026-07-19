@@ -24,7 +24,7 @@ jobs:
           host: linux
           target: desktop
           arch: linux_gcc_64
-          modules: qtwebengine qtwebchannel qtwebview qtimageformats
+          modules: qtwebengine qtwebchannel qtpositioning qtwebview qtimageformats
           cache: true
 
       - name: Install build + packaging deps
