@@ -44,6 +44,9 @@ jobs:
       - name: Deploy Qt runtime
         run: windeployqt --qmldir qml --release build/GeoBizUzbekistan.exe
 
+      - name: Install NSIS (installer generator)
+        run: choco install nsis -y --no-progress
+
       - name: Package (NSIS + ZIP)
         working-directory: build
         run: cpack -G "NSIS;ZIP"
