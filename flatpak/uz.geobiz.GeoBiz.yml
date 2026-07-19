@@ -13,7 +13,15 @@ app-id: uz.geobiz.GeoBiz
 runtime: org.kde.Platform
 runtime-version: '6.7'
 sdk: org.kde.Sdk
+# QtWebEngine is not part of the base KDE runtime; the QtWebEngine BaseApp
+# provides the WebEngine libraries and their CMake config at build/run time.
+base: io.qt.qtwebengine.BaseApp
+base-version: '6.7'
 command: GeoBizUzbekistan
+
+# The QtWebEngine BaseApp requires its cleanup script to run after the build.
+cleanup-commands:
+  - /app/cleanup-BaseApp.sh
 
 finish-args:
   # GPU acceleration for smooth rendering of tens of thousands of objects.

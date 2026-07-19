@@ -9,6 +9,7 @@
 #pragma once
 
 #include <cmath>
+#include <numbers>
 #include <utility>
 #include <vector>
 
@@ -63,10 +64,13 @@ using Polygon = std::vector<LatLng>;
 /// for "near me" style ranking when a reference point is available.
 [[nodiscard]] inline double distanceKm(const LatLng& a, const LatLng& b) noexcept {
     constexpr double kEarthRadiusKm = 6371.0088;
-    const double dLat = (b.lat - a.lat) * M_PI / 180.0;
-    const double dLng = (b.lng - a.lng) * M_PI / 180.0;
-    const double lat1 = a.lat * M_PI / 180.0;
-    const double lat2 = b.lat * M_PI / 180.0;
+    // Use std::numbers::pi rather than the non-standard M_PI, which MSVC does
+    // not define (and which strict-ISO GCC/Clang also hide) without extra macros.
+    constexpr double kDegToRad = std::numbers::pi / 180.0;
+    const double dLat = (b.lat - a.lat) * kDegToRad;
+    const double dLng = (b.lng - a.lng) * kDegToRad;
+    const double lat1 = a.lat * kDegToRad;
+    const double lat2 = b.lat * kDegToRad;
     const double h = std::sin(dLat / 2) * std::sin(dLat / 2) +
                      std::cos(lat1) * std::cos(lat2) *
                          std::sin(dLng / 2) * std::sin(dLng / 2);

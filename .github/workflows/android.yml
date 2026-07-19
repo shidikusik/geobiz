@@ -64,12 +64,15 @@ jobs:
 
       - name: Configure (Android ${{ env.ANDROID_ABI }})
         run: |
-          HOST_QT="${{ runner.temp }}/qt-host/${QT_VERSION}/gcc_64"
-          ANDROID_QT="${{ runner.temp }}/qt-android/${QT_VERSION}/${ANDROID_ARCH}"
-          "${ANDROID_QT}/bin/qt-cmake" -S . -B build-android -G Ninja \
+          # install-qt-action exports QT_ROOT_DIR (the Android Qt) and
+          # QT_HOST_PATH (the desktop host tools) — use them directly rather than
+          # reconstructing the paths (the action nests them under a Qt/ segment).
+          echo "Android Qt: $QT_ROOT_DIR"
+          echo "Host Qt:    $QT_HOST_PATH"
+          "$QT_ROOT_DIR/bin/qt-cmake" -S . -B build-android -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DANDROID_ABI=${ANDROID_ABI} \
-            -DQT_HOST_PATH="${HOST_QT}" \
+            -DQT_HOST_PATH="$QT_HOST_PATH" \
             -DGEOBIZ_BUILD_TESTS=OFF
 
       - name: Build APK + AAB

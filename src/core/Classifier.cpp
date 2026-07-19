@@ -29,14 +29,6 @@ std::vector<WeightedMetric> positiveMetrics(const Indicators& ind) {
     };
 }
 
-int countPresent(const Indicators& ind) {
-    int n = 0;
-    for (const auto& wm : positiveMetrics(ind)) {
-        if (wm.metric->hasValue()) ++n;
-    }
-    return n;
-}
-
 }  // namespace
 
 std::optional<double> compositeRating(const Indicators& indicators,
@@ -180,7 +172,6 @@ void applyClassification(District& district, const ClassifierConfig& cfg) {
     if (district.recommendations.empty()) {
         district.recommendations = deriveRecommendations(district);
     }
-    (void)countPresent;  // available for future diagnostics
 }
 
 }  // namespace geobiz::core
