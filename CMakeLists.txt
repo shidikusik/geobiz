@@ -82,6 +82,12 @@ qt_add_executable(geobiz
     src/map/DistrictSerializer.cpp
     src/ui/DistrictListModel.cpp
     src/ui/AppController.cpp
+    # Q_OBJECT headers must be listed so AUTOMOC processes them — they live in
+    # include/ while their .cpp files live in src/, so the same-directory moc
+    # heuristic would otherwise miss them (undefined vtable/signals at link).
+    include/geobiz/map/MapBridge.hpp
+    include/geobiz/ui/DistrictListModel.hpp
+    include/geobiz/ui/AppController.hpp
     resources.qrc
 )
 
