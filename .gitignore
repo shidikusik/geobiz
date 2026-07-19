@@ -1,0 +1,37 @@
+# Build directories
+/build*/
+/AppDir/
+/build-android/
+/build-flatpak/
+*.AppImage
+*.flatpak
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+compile_commands.json
+
+# Qt / generated
+*.qm
+*_autogen/
+.qmlls.ini
+qmlcache/
+
+# IDE
+.vscode/
+.idea/
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Packaging outputs
+*.exe
+*.zip
+*.apk
+*.aab
+installer/windows/app.ico

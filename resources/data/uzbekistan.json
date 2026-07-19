@@ -1,0 +1,42 @@
+{
+  "$schema": "./uzbekistan.schema.json",
+  "source": "Административное деление Республики Узбекистан (открытые географические данные)",
+  "note": "Названия территорий и приблизительные координаты центров являются открытыми географическими данными. Показатели (безопасность, экология, инфраструктура, сервис, бизнес-потенциал, уровень жизни, население и риски) намеренно НЕ заполнены: приложение не выдумывает данные и показывает 'Недостаточно данных', пока не подключён реальный источник (государственная/статистическая/экологическая/геологическая открытая информация). См. docs/DATA_SCHEMA.md.",
+  "districts": [
+    {
+      "id": "uz",
+      "parentId": "",
+      "name": { "ru": "Узбекистан", "uz": "Oʻzbekiston", "en": "Uzbekistan" },
+      "level": "country",
+      "center": { "lat": 41.377491, "lng": 64.585262 }
+    },
+
+    { "id": "uz.karakalpakstan", "parentId": "uz", "name": { "ru": "Республика Каракалпакстан", "uz": "Qoraqalpogʻiston Respublikasi", "en": "Republic of Karakalpakstan" }, "level": "region", "center": { "lat": 42.4600, "lng": 59.6170 } },
+    { "id": "uz.andijan", "parentId": "uz", "name": { "ru": "Андижанская область", "uz": "Andijon viloyati", "en": "Andijan Region" }, "level": "region", "center": { "lat": 40.7821, "lng": 72.3442 } },
+    { "id": "uz.bukhara", "parentId": "uz", "name": { "ru": "Бухарская область", "uz": "Buxoro viloyati", "en": "Bukhara Region" }, "level": "region", "center": { "lat": 39.7675, "lng": 64.4231 } },
+    { "id": "uz.fergana", "parentId": "uz", "name": { "ru": "Ферганская область", "uz": "Fargʻona viloyati", "en": "Fergana Region" }, "level": "region", "center": { "lat": 40.3864, "lng": 71.7864 } },
+    { "id": "uz.jizzakh", "parentId": "uz", "name": { "ru": "Джизакская область", "uz": "Jizzax viloyati", "en": "Jizzakh Region" }, "level": "region", "center": { "lat": 40.1158, "lng": 67.8422 } },
+    { "id": "uz.namangan", "parentId": "uz", "name": { "ru": "Наманганская область", "uz": "Namangan viloyati", "en": "Namangan Region" }, "level": "region", "center": { "lat": 40.9983, "lng": 71.6726 } },
+    { "id": "uz.navoiy", "parentId": "uz", "name": { "ru": "Навоийская область", "uz": "Navoiy viloyati", "en": "Navoiy Region" }, "level": "region", "center": { "lat": 40.0844, "lng": 65.3792 } },
+    { "id": "uz.kashkadarya", "parentId": "uz", "name": { "ru": "Кашкадарьинская область", "uz": "Qashqadaryo viloyati", "en": "Kashkadarya Region" }, "level": "region", "center": { "lat": 38.8600, "lng": 65.7897 } },
+    { "id": "uz.samarkand", "parentId": "uz", "name": { "ru": "Самаркандская область", "uz": "Samarqand viloyati", "en": "Samarkand Region" }, "level": "region", "center": { "lat": 39.6270, "lng": 66.9750 } },
+    { "id": "uz.surkhandarya", "parentId": "uz", "name": { "ru": "Сурхандарьинская область", "uz": "Surxondaryo viloyati", "en": "Surkhandarya Region" }, "level": "region", "center": { "lat": 37.2242, "lng": 67.2783 } },
+    { "id": "uz.syrdarya", "parentId": "uz", "name": { "ru": "Сырдарьинская область", "uz": "Sirdaryo viloyati", "en": "Syrdarya Region" }, "level": "region", "center": { "lat": 40.4897, "lng": 68.7842 } },
+    { "id": "uz.tashkent-region", "parentId": "uz", "name": { "ru": "Ташкентская область", "uz": "Toshkent viloyati", "en": "Tashkent Region" }, "level": "region", "center": { "lat": 41.0500, "lng": 69.5000 } },
+    { "id": "uz.khorezm", "parentId": "uz", "name": { "ru": "Хорезмская область", "uz": "Xorazm viloyati", "en": "Khorezm Region" }, "level": "region", "center": { "lat": 41.5500, "lng": 60.6317 } },
+
+    { "id": "uz.tashkent-city", "parentId": "uz", "name": { "ru": "город Ташкент", "uz": "Toshkent shahri", "en": "Tashkent City" }, "level": "city", "center": { "lat": 41.2995, "lng": 69.2401 } },
+
+    { "id": "uz.tashkent-city.bektemir", "parentId": "uz.tashkent-city", "name": { "ru": "Бектемирский район", "uz": "Bektemir tumani", "en": "Bektemir" }, "level": "district", "center": { "lat": 41.2119, "lng": 69.3339 } },
+    { "id": "uz.tashkent-city.chilanzar", "parentId": "uz.tashkent-city", "name": { "ru": "Чиланзарский район", "uz": "Chilonzor tumani", "en": "Chilanzar" }, "level": "district", "center": { "lat": 41.2747, "lng": 69.2039 } },
+    { "id": "uz.tashkent-city.mirabad", "parentId": "uz.tashkent-city", "name": { "ru": "Мирабадский район", "uz": "Mirobod tumani", "en": "Mirabad" }, "level": "district", "center": { "lat": 41.2856, "lng": 69.2711 } },
+    { "id": "uz.tashkent-city.mirzo-ulugbek", "parentId": "uz.tashkent-city", "name": { "ru": "Мирзо-Улугбекский район", "uz": "Mirzo Ulugʻbek tumani", "en": "Mirzo Ulugbek" }, "level": "district", "center": { "lat": 41.3236, "lng": 69.3339 } },
+    { "id": "uz.tashkent-city.sergeli", "parentId": "uz.tashkent-city", "name": { "ru": "Сергелийский район", "uz": "Sergeli tumani", "en": "Sergeli" }, "level": "district", "center": { "lat": 41.2247, "lng": 69.2200 } },
+    { "id": "uz.tashkent-city.shaykhantahur", "parentId": "uz.tashkent-city", "name": { "ru": "Шайхантахурский район", "uz": "Shayxontohur tumani", "en": "Shaykhantahur" }, "level": "district", "center": { "lat": 41.3256, "lng": 69.2333 } },
+    { "id": "uz.tashkent-city.olmazor", "parentId": "uz.tashkent-city", "name": { "ru": "Алмазарский район", "uz": "Olmazor tumani", "en": "Olmazor" }, "level": "district", "center": { "lat": 41.3494, "lng": 69.2033 } },
+    { "id": "uz.tashkent-city.uchtepa", "parentId": "uz.tashkent-city", "name": { "ru": "Учтепинский район", "uz": "Uchtepa tumani", "en": "Uchtepa" }, "level": "district", "center": { "lat": 41.2864, "lng": 69.1636 } },
+    { "id": "uz.tashkent-city.yakkasaray", "parentId": "uz.tashkent-city", "name": { "ru": "Яккасарайский район", "uz": "Yakkasaroy tumani", "en": "Yakkasaray" }, "level": "district", "center": { "lat": 41.2842, "lng": 69.2450 } },
+    { "id": "uz.tashkent-city.yashnabad", "parentId": "uz.tashkent-city", "name": { "ru": "Яшнабадский район", "uz": "Yashnobod tumani", "en": "Yashnabad" }, "level": "district", "center": { "lat": 41.2864, "lng": 69.3081 } },
+    { "id": "uz.tashkent-city.yunusabad", "parentId": "uz.tashkent-city", "name": { "ru": "Юнусабадский район", "uz": "Yunusobod tumani", "en": "Yunusabad" }, "level": "district", "center": { "lat": 41.3675, "lng": 69.2889 } }
+  ]
+}

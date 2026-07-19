@@ -1,0 +1,13 @@
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Fixed-path resources referenced directly by the C++ and HTML layers.
+     Aliases are chosen so the code can use stable paths (":/web/map.html",
+     ":/data/uzbekistan.json", ":/assets/icons/app.svg") independent of the
+     on-disk directory layout. -->
+<RCC>
+  <qresource prefix="/">
+    <file alias="web/map.html">resources/web/map.html</file>
+    <file alias="web/map.js">resources/web/map.js</file>
+    <file alias="data/uzbekistan.json">resources/data/uzbekistan.json</file>
+    <file alias="assets/icons/app.svg">assets/icons/app.svg</file>
+  </qresource>
+</RCC>

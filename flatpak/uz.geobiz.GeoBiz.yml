@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: MIT
+#
+# Flatpak manifest for GeoBiz Uzbekistan.
+#
+# Built against the KDE runtime because it ships Qt 6 including QtWebEngine and
+# QtWebChannel, which the app needs for the Google Maps layer. Build with:
+#
+#   flatpak install flathub org.kde.Platform//6.7 org.kde.Sdk//6.7
+#   flatpak-builder --user --install --force-clean build-flatpak \
+#       flatpak/uz.geobiz.GeoBiz.yml
+#
+app-id: uz.geobiz.GeoBiz
+runtime: org.kde.Platform
+runtime-version: '6.7'
+sdk: org.kde.Sdk
+command: GeoBizUzbekistan
+
+finish-args:
+  # GPU acceleration for smooth rendering of tens of thousands of objects.
+  - --device=dri
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  # Network access is required for the Google Maps / Places / Geocoding APIs.
+  - --share=network
+  # Persist the per-user config (API key, dataset path).
+  - --filesystem=xdg-config/GeoBiz:create
+
+modules:
+  - name: geobiz
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DGEOBIZ_BUILD_TESTS=OFF
+    sources:
+      # For local builds this points at the checked-out source tree. In CI the
+      # 'dir' source is replaced with a git/archive source pinned to a tag.
+      - type: dir
+        path: ..

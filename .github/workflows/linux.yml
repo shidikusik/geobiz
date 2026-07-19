@@ -1,0 +1,73 @@
+# SPDX-License-Identifier: MIT
+# Builds the Linux binary and packages it as an AppImage. A separate Flatpak job
+# builds the flatpak bundle against the KDE runtime.
+name: linux
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  appimage:
+    name: Linux (AppImage)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt 6 (with WebEngine)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.7.2"
+          host: linux
+          target: desktop
+          arch: linux_gcc_64
+          modules: qtwebengine qtwebchannel qtwebview qtimageformats
+          cache: true
+
+      - name: Install build + packaging deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build cmake libgl1-mesa-dev \
+            libxkbcommon-dev libnss3 libxcomposite1 libxdamage1 libxrandr2 \
+            fuse file
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod +x linuxdeploy*.AppImage
+
+      - name: Configure + build
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
+
+      - name: Install into AppDir
+        run: DESTDIR=AppDir cmake --install build --prefix /usr
+
+      - name: Build AppImage
+        env:
+          QML_SOURCES_PATHS: ${{ github.workspace }}/qml
+        run: |
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt \
+            --output appimage \
+            --desktop-file flatpak/uz.geobiz.GeoBiz.desktop \
+            --icon-file assets/icons/app.svg
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: geobiz-linux-appimage
+          path: "*.AppImage"
+
+  flatpak:
+    name: Linux (Flatpak)
+    runs-on: ubuntu-22.04
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:kde-6.7
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: geobiz.flatpak
+          manifest-path: flatpak/uz.geobiz.GeoBiz.yml
+          cache-key: flatpak-builder-${{ github.sha }}

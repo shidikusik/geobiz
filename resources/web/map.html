@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!--
+  map.html — the Google Maps host page loaded inside QtWebEngine.
+
+  This page contains NO business logic. It:
+    1. connects to the native bridge via QWebChannel,
+    2. loads the real Google Maps JavaScript API using the key the native side
+       supplies (configReady),
+    3. renders the district polygons/markers it receives (renderDistricts),
+    4. forwards clicks and errors back to the native side.
+
+  All map rendering uses the official Google Maps JS API, Places and Geocoding
+  libraries — no third-party or drawn maps.
+-->
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GeoBiz Uzbekistan — Map</title>
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; background: #111418; }
+    #map { height: 100%; width: 100%; }
+    /* Fallback / error overlay shown if Maps fails to load. */
+    #overlay {
+      position: absolute; inset: 0; display: none;
+      align-items: center; justify-content: center;
+      font-family: "Segoe UI", Roboto, sans-serif; color: #e2e2e6;
+      background: #111418; text-align: center; padding: 24px;
+    }
+    #overlay.show { display: flex; }
+    /* Search box injected into the map controls area. */
+    #searchbox {
+      box-sizing: border-box; border: none; border-radius: 8px;
+      padding: 10px 12px; margin: 10px; width: 280px; max-width: 60vw;
+      font-size: 14px; font-family: "Segoe UI", Roboto, sans-serif;
+      box-shadow: 0 2px 8px rgba(0,0,0,.3); outline: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="overlay"><div id="overlay-text">Загрузка карты…</div></div>
+  <input id="searchbox" type="text" placeholder="Поиск места в Узбекистане…" />
+
+  <!-- Qt-provided WebChannel client. Available at this virtual path inside
+       QtWebEngine whenever a channel is attached to the page. -->
+  <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+  <script src="map.js"></script>
+</body>
+</html>

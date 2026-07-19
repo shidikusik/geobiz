@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!-- SPDX-License-Identifier: MIT -->
+<!-- Android manifest template for GeoBiz Uzbekistan (Qt 6 for Android).
+     Qt's androiddeployqt fills the %%…%% placeholders during packaging. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="uz.geobiz.app"
+    android:versionName="1.0.0"
+    android:versionCode="1"
+    android:installLocation="auto">
+
+    <!-- The Google Maps / Places / Geocoding APIs require network access. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Optional: used only if the user opts into "near me" ranking. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <supports-screens
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:anyDensity="true"/>
+
+    <application
+        android:name="org.qtproject.qt.android.bindings.QtApplication"
+        android:label="GeoBiz Uzbekistan"
+        android:icon="@drawable/icon"
+        android:hardwareAccelerated="true"
+        android:allowBackup="true"
+        android:requestLegacyExternalStorage="false"
+        android:usesCleartextTraffic="false">
+
+        <activity
+            android:name="org.qtproject.qt.android.bindings.QtActivity"
+            android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
+            android:label="GeoBiz Uzbekistan"
+            android:launchMode="singleTop"
+            android:screenOrientation="unspecified"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
+            <!-- Qt runtime metadata. Values in %%…%% are substituted by Qt. -->
+            <meta-data android:name="android.app.lib_name" android:value="-- %%INSERT_APP_LIB_NAME%% --"/>
+            <meta-data android:name="android.app.arguments" android:value="-- %%INSERT_APP_ARGUMENTS%% --"/>
+        </activity>
+
+        <!-- Optional: configure the Google Maps Android API key placeholder.
+             The web layer receives its key at runtime from the app config, so
+             this is only needed if native Maps SDK is added later. -->
+        <!-- <meta-data android:name="com.google.android.geo.API_KEY"
+                     android:value="${GOOGLE_MAPS_API_KEY}"/> -->
+    </application>
+</manifest>

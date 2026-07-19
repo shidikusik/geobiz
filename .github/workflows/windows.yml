@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: MIT
+# Builds the Windows .exe, deploys the Qt runtime, and produces the NSIS
+# installer + portable ZIP.
+name: windows
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Windows (.exe + installer)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt 6 (with WebEngine)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.7.2"
+          host: windows
+          target: desktop
+          arch: win64_msvc2019_64
+          modules: qtwebengine qtwebchannel qtwebview qtimageformats
+          cache: true
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Generate .ico from SVG
+        shell: pwsh
+        run: |
+          # ImageMagick ships on the GitHub Windows runners.
+          magick -background none assets/icons/app.svg -define icon:auto-resize=256,128,64,48,32,16 installer/windows/app.ico
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Deploy Qt runtime
+        run: windeployqt --qmldir qml --release build/GeoBizUzbekistan.exe
+
+      - name: Package (NSIS + ZIP)
+        working-directory: build
+        run: cpack -G "NSIS;ZIP"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: geobiz-windows
+          path: |
+            build/*.exe
+            build/*.zip

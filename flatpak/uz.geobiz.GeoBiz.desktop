@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=GeoBiz Uzbekistan
+GenericName=District Analytics
+Comment=Благополучность, безопасность, экология и бизнес-потенциал районов Узбекистана на карте Google
+Exec=GeoBizUzbekistan
+Icon=uz.geobiz.GeoBiz
+Terminal=false
+Categories=Office;Science;Geography;Maps;
+Keywords=map;uzbekistan;business;geo;districts;
+StartupWMClass=GeoBizUzbekistan

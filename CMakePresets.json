@@ -1,0 +1,45 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "core-only",
+      "displayName": "Core library + tests (no Qt)",
+      "description": "Fast build of the pure C++23 domain library and its tests.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-core",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "GEOBIZ_CORE_ONLY": "ON"
+      }
+    },
+    {
+      "name": "desktop-release",
+      "displayName": "Desktop application (Release)",
+      "description": "Full Qt Quick app with the WebEngine map backend.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "desktop-debug",
+      "inherits": "desktop-release",
+      "displayName": "Desktop application (Debug)",
+      "binaryDir": "${sourceDir}/build-debug",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    }
+  ],
+  "buildPresets": [
+    { "name": "core-only", "configurePreset": "core-only" },
+    { "name": "desktop-release", "configurePreset": "desktop-release" }
+  ],
+  "testPresets": [
+    {
+      "name": "core-only",
+      "configurePreset": "core-only",
+      "output": { "outputOnFailure": true }
+    }
+  ]
+}
