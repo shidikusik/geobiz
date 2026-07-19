@@ -24,7 +24,10 @@ apply plugin: 'com.android.application'
 
 android {
     namespace 'uz.geobiz.app'
-    compileSdkVersion androidCompileSdkVersion.toInteger()
+    // Hardcode an integer compileSdk: androiddeployqt may resolve the runner's
+    // newest platform to a non-integer string (e.g. "android-36-ext19"), which
+    // breaks androidCompileSdkVersion.toInteger(). We install android-34 in CI.
+    compileSdk 34
     ndkVersion androidNdkVersion
 
     defaultConfig {
