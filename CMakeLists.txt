@@ -158,6 +158,19 @@ install(TARGETS geobiz
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
+# On Windows the CPack installer/ZIP must be self-contained: bundle the Qt
+# runtime (DLLs, QML modules, the WebEngine process + resources) into the install
+# tree via Qt's deploy script. Without this the installed app is missing its Qt
+# DLLs and fails to launch. Linux uses AppImage/Flatpak for deployment instead.
+if(WIN32)
+    qt_generate_deploy_qml_app_script(
+        TARGET geobiz
+        OUTPUT_SCRIPT geobiz_deploy_script
+        NO_UNSUPPORTED_PLATFORM_ERROR
+    )
+    install(SCRIPT ${geobiz_deploy_script})
+endif()
+
 if(UNIX AND NOT ANDROID AND NOT APPLE)
     install(FILES flatpak/uz.geobiz.GeoBiz.desktop
         DESTINATION ${CMAKE_INSTALL_DATADIR}/applications OPTIONAL)

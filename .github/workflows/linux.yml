@@ -20,6 +20,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # One-time cleanup: earlier builds used over-broad globs that attached
+      # build tools and intermediate files to the v1.0.0 release. Remove those
+      # stale assets (no current job re-creates these names, so this is safe).
+      - name: Remove stale release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for a in linuxdeploy-x86_64.AppImage linuxdeploy-plugin-qt-x86_64.AppImage \
+                   vc_redist.x64.exe QtWebEngineProcess.exe geobiz_core_tests.exe \
+                   GeoBizUzbekistan.exe intermediary-bundle.aab \
+                   android-build-debug.aab geobiz.apk; do
+            gh release delete-asset v1.0.0 "$a" -y -R "$GITHUB_REPOSITORY" 2>/dev/null || true
+          done
+
       - name: Install Qt 6 (with WebEngine)
         uses: jurplel/install-qt-action@v4
         with:
@@ -61,7 +75,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: geobiz-linux-appimage
-          path: "*.AppImage"
+          # Only our AppImage, not the linuxdeploy tool AppImages in the workspace.
+          path: "GeoBiz*.AppImage"
 
       - name: Publish to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -69,7 +84,7 @@ jobs:
           tag_name: v1.0.0
           name: GeoBiz Uzbekistan v1.0.0
           body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
-          files: "*.AppImage"
+          files: "GeoBiz*.AppImage"
           fail_on_unmatched_files: false
 
   flatpak:

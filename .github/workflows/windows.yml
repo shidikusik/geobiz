@@ -45,12 +45,11 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Deploy Qt runtime
-        run: windeployqt --qmldir qml --release build/GeoBizUzbekistan.exe
-
       - name: Install NSIS (installer generator)
         run: choco install nsis -y --no-progress
 
+      # CPack runs `cmake --install`, which triggers the Qt deploy script from
+      # CMakeLists.txt and bundles the full Qt runtime into the package.
       - name: Package (NSIS + ZIP)
         working-directory: build
         run: cpack -G "NSIS;ZIP"
@@ -60,8 +59,8 @@ jobs:
         with:
           name: geobiz-windows
           path: |
-            build/*.exe
-            build/*.zip
+            build/*win64.exe
+            build/*win64.zip
 
       - name: Publish to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -69,7 +68,9 @@ jobs:
           tag_name: v1.0.0
           name: GeoBiz Uzbekistan v1.0.0
           body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
+          # Only the CPack outputs (installer + portable ZIP), not the loose
+          # deployed runtime files that also live under build/.
           files: |
-            build/*.exe
-            build/*.zip
+            build/*win64.exe
+            build/*win64.zip
           fail_on_unmatched_files: false

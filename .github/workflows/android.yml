@@ -96,9 +96,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: geobiz-android
+          # Only the final release APK/AAB, not debug or intermediary bundles.
           path: |
-            build-android/**/*.apk
-            build-android/**/*.aab
+            build-android/**/*-release-unsigned.apk
+            build-android/**/*-release.aab
           if-no-files-found: warn
 
       - name: Publish to GitHub Release
@@ -108,6 +109,6 @@ jobs:
           name: GeoBiz Uzbekistan v1.0.0
           body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
           files: |
-            build-android/**/*.apk
-            build-android/**/*.aab
+            build-android/**/*-release-unsigned.apk
+            build-android/**/*-release.aab
           fail_on_unmatched_files: false
