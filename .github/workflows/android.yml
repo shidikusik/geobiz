@@ -1,0 +1,114 @@
+# SPDX-License-Identifier: MIT
+# Builds the Android APK and AAB using Qt for Android (QtWebView backend).
+name: android
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  QT_VERSION: "6.7.2"
+  ANDROID_ABI: "arm64-v8a"
+  ANDROID_ARCH: "android_arm64_v8a"
+  NDK_VERSION: "26.1.10909125"
+
+jobs:
+  build:
+    name: Android (APK + AAB)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # Provides a working `sdkmanager` on PATH and sets ANDROID_SDK_ROOT.
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK + platform + build-tools
+        run: |
+          sdkmanager "ndk;${NDK_VERSION}" "platforms;android-34" "build-tools;34.0.0"
+          echo "ANDROID_NDK_ROOT=${ANDROID_SDK_ROOT}/ndk/${NDK_VERSION}" >> "$GITHUB_ENV"
+          # androiddeployqt selects the newest platform present for compileSdk.
+          # The runner ships newer platform stubs and extension SDKs (android-37,
+          # android-36-ext19, …) that are either not fully installed or have
+          # non-integer names, which break the gradle build. Keep only the
+          # android-34 platform we installed so the chosen compileSdk exists.
+          find "${ANDROID_SDK_ROOT}/platforms" -mindepth 1 -maxdepth 1 \
+            ! -name 'android-34' -exec rm -rf {} + || true
+          ls "${ANDROID_SDK_ROOT}/platforms"
+
+      - name: Install host Qt (moc / androiddeployqt)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: linux
+          target: desktop
+          arch: linux_gcc_64
+          dir: ${{ runner.temp }}/qt-host
+          modules: qtwebview
+          cache: true
+
+      - name: Install Android Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: linux
+          target: android
+          arch: ${{ env.ANDROID_ARCH }}
+          dir: ${{ runner.temp }}/qt-android
+          modules: qtwebview
+          cache: true
+
+      - name: Install Ninja
+        run: sudo apt-get update && sudo apt-get install -y ninja-build
+
+      - name: Configure (Android ${{ env.ANDROID_ABI }})
+        run: |
+          # install-qt-action exports QT_ROOT_DIR (the Android Qt) and
+          # QT_HOST_PATH (the desktop host tools) — use them directly rather than
+          # reconstructing the paths (the action nests them under a Qt/ segment).
+          echo "Android Qt: $QT_ROOT_DIR"
+          echo "Host Qt:    $QT_HOST_PATH"
+          "$QT_ROOT_DIR/bin/qt-cmake" -S . -B build-android -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DANDROID_ABI=${ANDROID_ABI} \
+            -DQT_HOST_PATH="$QT_HOST_PATH" \
+            -DGEOBIZ_BUILD_TESTS=OFF
+
+      - name: Build APK + AAB
+        run: |
+          cmake --build build-android
+          cmake --build build-android --target apk
+          cmake --build build-android --target aab
+
+      - name: Upload Android packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: geobiz-android
+          # Only the final release APK/AAB, not debug or intermediary bundles.
+          path: |
+            build-android/**/*-release-unsigned.apk
+            build-android/**/*-release.aab
+          if-no-files-found: warn
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: GeoBiz Uzbekistan v1.0.0
+          body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
+          files: |
+            build-android/**/*-release-unsigned.apk
+            build-android/**/*-release.aab
+          fail_on_unmatched_files: false

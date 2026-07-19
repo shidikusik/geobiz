@@ -1,0 +1,76 @@
+# SPDX-License-Identifier: MIT
+# Builds the Windows .exe, deploys the Qt runtime, and produces the NSIS
+# installer + portable ZIP.
+name: windows
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Needed so the build can publish the artifacts to a GitHub Release.
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Windows (.exe + installer)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt 6 (with WebEngine)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.7.2"
+          host: windows
+          target: desktop
+          arch: win64_msvc2019_64
+          modules: qtwebengine qtwebchannel qtpositioning qtwebview qtimageformats
+          cache: true
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Generate .ico from SVG
+        shell: pwsh
+        run: |
+          # ImageMagick ships on the GitHub Windows runners.
+          magick -background none assets/icons/app.svg -define icon:auto-resize=256,128,64,48,32,16 installer/windows/app.ico
+
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Install NSIS (installer generator)
+        run: choco install nsis -y --no-progress
+
+      # CPack runs `cmake --install`, which triggers the Qt deploy script from
+      # CMakeLists.txt and bundles the full Qt runtime into the package.
+      - name: Package (NSIS + ZIP)
+        working-directory: build
+        run: cpack -G "NSIS;ZIP"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: geobiz-windows
+          path: |
+            build/*win64.exe
+            build/*win64.zip
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: GeoBiz Uzbekistan v1.0.0
+          body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
+          # Only the CPack outputs (installer + portable ZIP), not the loose
+          # deployed runtime files that also live under build/.
+          files: |
+            build/*win64.exe
+            build/*win64.zip
+          fail_on_unmatched_files: false

@@ -1,0 +1,111 @@
+# SPDX-License-Identifier: MIT
+# Builds the Linux binary and packages it as an AppImage. A separate Flatpak job
+# builds the flatpak bundle against the KDE runtime.
+name: linux
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  appimage:
+    name: Linux (AppImage)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # One-time cleanup: earlier builds used over-broad globs that attached
+      # build tools and intermediate files to the v1.0.0 release. Remove those
+      # stale assets (no current job re-creates these names, so this is safe).
+      - name: Remove stale release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for a in linuxdeploy-x86_64.AppImage linuxdeploy-plugin-qt-x86_64.AppImage \
+                   vc_redist.x64.exe QtWebEngineProcess.exe geobiz_core_tests.exe \
+                   GeoBizUzbekistan.exe intermediary-bundle.aab \
+                   android-build-debug.aab geobiz.apk; do
+            gh release delete-asset v1.0.0 "$a" -y -R "$GITHUB_REPOSITORY" 2>/dev/null || true
+          done
+
+      - name: Install Qt 6 (with WebEngine)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.7.2"
+          host: linux
+          target: desktop
+          arch: linux_gcc_64
+          modules: qtwebengine qtwebchannel qtpositioning qtserialport qtwebview qtimageformats
+          cache: true
+
+      - name: Install build + packaging deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build cmake libgl1-mesa-dev \
+            libxkbcommon-dev libnss3 libxcomposite1 libxdamage1 libxrandr2 \
+            fuse file
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod +x linuxdeploy*.AppImage
+
+      - name: Configure + build
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
+
+      - name: Install into AppDir
+        run: DESTDIR=AppDir cmake --install build --prefix /usr
+
+      - name: Build AppImage
+        env:
+          QML_SOURCES_PATHS: ${{ github.workspace }}/qml
+        run: |
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt \
+            --output appimage \
+            --desktop-file flatpak/uz.geobiz.GeoBiz.desktop \
+            --icon-file assets/icons/app.svg
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: geobiz-linux-appimage
+          # Only our AppImage, not the linuxdeploy tool AppImages in the workspace.
+          path: "GeoBiz*.AppImage"
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: GeoBiz Uzbekistan v1.0.0
+          body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
+          files: "GeoBiz*.AppImage"
+          fail_on_unmatched_files: false
+
+  flatpak:
+    name: Linux (Flatpak)
+    runs-on: ubuntu-22.04
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:kde-6.7
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: geobiz.flatpak
+          manifest-path: flatpak/uz.geobiz.GeoBiz.yml
+          cache-key: flatpak-builder-${{ github.sha }}
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: GeoBiz Uzbekistan v1.0.0
+          body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
+          files: geobiz.flatpak
+          fail_on_unmatched_files: false

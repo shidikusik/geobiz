@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://geobiz.uz/schema/uzbekistan.schema.json",
+  "title": "GeoBiz territory dataset",
+  "description": "Schema for the territory dataset consumed by LocalDatasetProvider. Every quantitative field is optional so that missing data is represented explicitly and never fabricated.",
+  "type": "object",
+  "required": ["districts"],
+  "properties": {
+    "source": { "type": "string" },
+    "note": { "type": "string" },
+    "districts": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/district" }
+    }
+  },
+  "definitions": {
+    "metric": {
+      "type": "object",
+      "properties": {
+        "value": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "source": { "type": "string" }
+      }
+    },
+    "latlng": {
+      "type": "object",
+      "required": ["lat", "lng"],
+      "properties": {
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lng": { "type": "number", "minimum": -180, "maximum": 180 }
+      }
+    },
+    "district": {
+      "type": "object",
+      "required": ["id", "name", "level", "center"],
+      "properties": {
+        "id": { "type": "string" },
+        "parentId": { "type": "string" },
+        "name": {
+          "type": "object",
+          "properties": {
+            "ru": { "type": "string" },
+            "uz": { "type": "string" },
+            "en": { "type": "string" }
+          }
+        },
+        "level": {
+          "type": "string",
+          "enum": ["country", "region", "city", "district", "mahalla"]
+        },
+        "center": { "$ref": "#/definitions/latlng" },
+        "boundary": {
+          "type": "array",
+          "description": "Polygon ring. Each item is [lat, lng] or {lat, lng}.",
+          "items": {
+            "oneOf": [
+              { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+              { "$ref": "#/definitions/latlng" }
+            ]
+          }
+        },
+        "population": {
+          "type": "object",
+          "properties": {
+            "value": { "type": ["integer", "null"], "minimum": 0 },
+            "source": { "type": "string" }
+          }
+        },
+        "indicators": {
+          "type": "object",
+          "properties": {
+            "safety": { "$ref": "#/definitions/metric" },
+            "ecology": { "$ref": "#/definitions/metric" },
+            "infrastructure": { "$ref": "#/definitions/metric" },
+            "service": { "$ref": "#/definitions/metric" },
+            "businessPotential": { "$ref": "#/definitions/metric" },
+            "wealth": { "$ref": "#/definitions/metric" },
+            "healthHazard": { "$ref": "#/definitions/metric" },
+            "constructionRisk": { "$ref": "#/definitions/metric" },
+            "technogenicRisk": { "$ref": "#/definitions/metric" },
+            "crime": { "$ref": "#/definitions/metric" }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

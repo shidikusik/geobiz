@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: MIT -->
+<component type="desktop-application">
+  <id>uz.geobiz.GeoBiz</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>GeoBiz Uzbekistan</name>
+  <summary>District wellbeing, safety, ecology and business potential on Google Maps</summary>
+
+  <description>
+    <p>
+      GeoBiz Uzbekistan visualises the wellbeing, safety, ecology and business
+      potential of Uzbekistan's territories — regions, cities, districts and
+      mahallas — directly on a real Google Maps layer. Territories are coloured
+      into transparent zones (green, purple, blue, gray, yellow, orange, red)
+      and a built-in offline assistant answers business questions such as where
+      to open a coffee shop or which districts are safest.
+    </p>
+    <p>
+      The app never fabricates data: territories without sufficient information
+      are clearly marked "Недостаточно данных" and are left uncoloured.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">uz.geobiz.GeoBiz.desktop</launchable>
+  <categories>
+    <category>Office</category>
+    <category>Science</category>
+  </categories>
+
+  <url type="homepage">https://geobiz.uz</url>
+  <content_rating type="oars-1.1"/>
+
+  <releases>
+    <release version="1.0.0" date="2026-07-19">
+      <description>
+        <p>First release: Google Maps integration, colour zones, district
+        details, and the local AI assistant.</p>
+      </description>
+    </release>
+  </releases>
+</component>
