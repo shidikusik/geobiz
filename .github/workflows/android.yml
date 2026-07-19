@@ -9,6 +9,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 env:
   QT_VERSION: "6.7.2"
   ANDROID_ABI: "arm64-v8a"
@@ -97,3 +100,14 @@ jobs:
             build-android/**/*.apk
             build-android/**/*.aab
           if-no-files-found: warn
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: GeoBiz Uzbekistan v1.0.0
+          body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
+          files: |
+            build-android/**/*.apk
+            build-android/**/*.aab
+          fail_on_unmatched_files: false

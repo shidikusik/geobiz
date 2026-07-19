@@ -10,6 +10,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Needed so the build can publish the artifacts to a GitHub Release.
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Windows (.exe + installer)
@@ -58,3 +62,14 @@ jobs:
           path: |
             build/*.exe
             build/*.zip
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: GeoBiz Uzbekistan v1.0.0
+          body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
+          files: |
+            build/*.exe
+            build/*.zip
+          fail_on_unmatched_files: false

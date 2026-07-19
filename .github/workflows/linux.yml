@@ -10,6 +10,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   appimage:
     name: Linux (AppImage)
@@ -60,6 +63,15 @@ jobs:
           name: geobiz-linux-appimage
           path: "*.AppImage"
 
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: GeoBiz Uzbekistan v1.0.0
+          body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
+          files: "*.AppImage"
+          fail_on_unmatched_files: false
+
   flatpak:
     name: Linux (Flatpak)
     runs-on: ubuntu-22.04
@@ -73,3 +85,12 @@ jobs:
           bundle: geobiz.flatpak
           manifest-path: flatpak/uz.geobiz.GeoBiz.yml
           cache-key: flatpak-builder-${{ github.sha }}
+
+      - name: Publish to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: GeoBiz Uzbekistan v1.0.0
+          body: "Автоматические сборки GeoBiz Uzbekistan (Windows / Linux / Android)."
+          files: geobiz.flatpak
+          fail_on_unmatched_files: false
